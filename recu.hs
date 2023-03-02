@@ -34,6 +34,8 @@ sigueA usuario1 usuario2 =  elem  (nombre usuario2) (seguidos usuario1)
 
 --punto 3
 
+seguidores :: Usuario -> [Usuario] -> [Nombre]
+seguidores usuario lista = map  nombre (filter (sigueA usuario) lista)
 
 --seguidores usuario1 usuarios =  filter seguido usuarios
 
@@ -42,7 +44,7 @@ favear::Mensaje -> Mensaje
 favear mensaje = mensaje { favs =favs mensaje + 1 }
 
 editar:: String->Mensaje->Mensaje
-editar comentario mensaje = mensaje {texto =  comentario ++ ( texto mensaje) }
+editar comentario mensaje = mensaje {texto =  comentario ++ " " ++ ( texto mensaje) }
 
 repipear:: Usuario->Mensaje->Mensaje
 repipear usuario1 mensaje = mensaje {favs = 0, usuario = (nombre usuario1), texto = usuario mensaje ++ ": " ++ texto mensaje}
@@ -54,9 +56,32 @@ Por ejemplo, no sabe si repipearlo o favearlo, o tal vez editarlo, o todo junto�
 Definir una función que dado un mensaje y dos posibles acciones, realice la que permite obtener 
 el pip con la mayor valoración, obteniendo como respuesta el mensaje resultante. 
 Mostrar dos ejemplos de invocación usando acciones diferentes. -}
-
+type Accion = Mensaje->Mensaje
+mejorAccionAHacer::Mensaje->Accion->Accion->Mensaje
 mejorAccionAHacer mensaje accion1 accion2
-    | valoracion (accion1 mensaje) > valoracion (accion2 mensaje) = accion1 mensaje
-    |otherwise = accion2 mensaje
+    | valoracion (accion1 mensaje) > valoracion (accion2 mensaje) = accion1 mensaje --si es mayor valoracion accion 1 que accion2
+    |valoracion (accion1 mensaje) < valoracion (accion2 mensaje) = accion2 mensaje  --si es menor valoracion accion 1 que accion2
+    |otherwise = accion1 mensaje                                                    -- si son iguales que me retorne la primera
 
+{- ejemplo 1
+ mejorAccionAHacer unMensaje favear (editar "hola")
+devuelve  Mensaje {usuario = "@titoOk", texto = "Las personas que viajan en tren se quejan de llenos", favs = 101}
+
+ya que las acciones me devulven un mensaje
+como la valoracion mensaje = favs mensaje - cantidadCaracteresTextoUsuario mensaje
+favear un mensaje me retorna favs=101  y texto 51
+editar mensaje retorna favs=100 y texto 56
+
+como la valoracion es la cantidad de favs menos la cantidadCaracteresTextoUsuario
+(101-51)>(100-55) luego favear tiene mas valoracion
+
+ejemplo2
+ mejorAccionAHacer unMensaje (editar "hola") (repipear churrasco)
+devulve Mensaje {usuario = "@titoOk", texto = "hola Las personas que viajan en tren se quejan de llenos", favs = 100}
+ editar "hola" me devulve un mensaje con favs=100 texto = 56
+ ripiar tito unMensaje me devuelve favs=0 texto = 51+2+60
+
+ como (100-55)>(0-51-2-60) luego se elige editarlo
+
+ -}
 
